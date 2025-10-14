@@ -1,6 +1,11 @@
 
 
-#include "framework.h"
+//#include "framework.h"
+#include <windows.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include "resource.h"
+#include "tool.h"
 int daochubiaojiexiinfile(char* filedata, HWND dadjubing)
 {
 	PIMAGE_DOS_HEADER pedosheader = (PIMAGE_DOS_HEADER)filedata;

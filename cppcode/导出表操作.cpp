@@ -1,6 +1,10 @@
 
 
-#include "framework.h"
+//#include "framework.h"
+#include <windows.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include "tool.h"
 
 int namegetdaochufuninfile(char* filedata,char* name)
 {
@@ -12,14 +16,14 @@ int namegetdaochufuninfile(char* filedata,char* name)
 	
 	int daochumemaddress = pekexuanheader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
 	int daochufileaddress = addressmemtofile(filedata, daochumemaddress);
-	printf("%x,\n", daochumemaddress);
-	printf("%x,\n", daochufileaddress);
+	/*printf("%x,\n", daochumemaddress);
+	printf("%x,\n", daochufileaddress);*/
 
 	PIMAGE_EXPORT_DIRECTORY pedaochubiao = (PIMAGE_EXPORT_DIRECTORY)(filedata+daochufileaddress);
 	int base = pedaochubiao->Base;
 	int num = pedaochubiao->NumberOfFunctions;
-	printf("%x,\n", base);
-	printf("%x\n", num);
+	//printf("%x,\n", base);
+	//printf("%x\n", num);
 	int* funname = (int*)(filedata+addressmemtofile(filedata, pedaochubiao->AddressOfNames));
 	WORD* xuhao = (WORD*)(filedata+addressmemtofile(filedata, pedaochubiao->AddressOfNameOrdinals));
 	int* funaddress = (int*)(filedata+addressmemtofile(filedata, pedaochubiao->AddressOfFunctions));
@@ -32,15 +36,15 @@ int namegetdaochufuninfile(char* filedata,char* name)
 		{
 			int resfunaddress = (int)(filedata + addressmemtofile(filedata, funaddress[xuhao[i]]));
 			//printf("%s\n", namezhi);
-			printf("%x\n", resfunaddress);
+			/*printf("%x\n", resfunaddress);
 			printf("%x\n", addressmemtofile(filedata, funaddress[xuhao[i]]));
-			printf("成功找到该函数！\n");
+			printf("成功找到该函数！\n");*/
 			return resfunaddress;
 		}
 		
 	}
 	
-	printf("没有找到该函数！\n");
+	//printf("没有找到该函数！\n");
 	return 0;
 }
 
@@ -54,14 +58,14 @@ int xuhaogetdaochufuninfile(char* filedata, int cxuhao)
 
 	int daochumemaddress = pekexuanheader->DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
 	int daochufileaddress = addressmemtofile(filedata, daochumemaddress);
-	printf("%x,\n", daochumemaddress);
-	printf("%x,\n", daochufileaddress);
+	//printf("%x,\n", daochumemaddress);
+	//printf("%x,\n", daochufileaddress);
 
 	PIMAGE_EXPORT_DIRECTORY pedaochubiao = (PIMAGE_EXPORT_DIRECTORY)(filedata + daochufileaddress);
 	int base = pedaochubiao->Base;
 	int num = pedaochubiao->NumberOfFunctions;
-	printf("%x,\n", base);
-	printf("%x\n", num);
+	//printf("%x,\n", base);
+	//printf("%x\n", num);
 	int* funname = (int*)(filedata + addressmemtofile(filedata, pedaochubiao->AddressOfNames));
 	WORD* xuhao = (WORD*)(filedata + addressmemtofile(filedata, pedaochubiao->AddressOfNameOrdinals));
 	int* funaddress = (int*)(filedata + addressmemtofile(filedata, pedaochubiao->AddressOfFunctions));
@@ -69,16 +73,16 @@ int xuhaogetdaochufuninfile(char* filedata, int cxuhao)
 
 	if (cxuhao - base < 0 || ((cxuhao - base) > (num - 1)))
 	{
-		printf("该序号没有对应函数！\n");
+		//printf("该序号没有对应函数！\n");
 		return 0;
 	}
 
-	printf("%x\n", funaddress[cxuhao - base]);
+	//printf("%x\n", funaddress[cxuhao - base]);
 
 	int resfunaddress = (int)(filedata + addressmemtofile(filedata, funaddress[cxuhao - base]));
 
-	printf("%x\n", resfunaddress);
-	printf("成功找到该函数！\n");
+	//printf("%x\n", resfunaddress);
+	//printf("成功找到该函数！\n");
 
 	return resfunaddress;
 }

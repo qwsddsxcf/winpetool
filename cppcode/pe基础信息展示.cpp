@@ -1,6 +1,19 @@
-#include "pe基础信息展示.h"
+//#include "pe基础信息展示.h"
+#include <windows.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include "tool.h"
+#include "resource.h"
+#include <CommCtrl.h>
+#include "资源表解析.h"
+#include "重定位表解析.h"
+#include "导入表解析.h"
+#include "导出表解析.h"
 TCHAR tmp[MAX_PATH] = _T("");
-extern TCHAR filepath[MAX_PATH];
+ namespace winpetoolfile {
+	 extern TCHAR filepath[MAX_PATH];
+}
+
 
 int showpejichuinfo(char* filedata, HWND dadjubing)
 {
@@ -9,7 +22,7 @@ int showpejichuinfo(char* filedata, HWND dadjubing)
 		MessageBox(NULL, TEXT("文件内容为空"), TEXT("error"), NULL);
 		return 0;
 	}
-	_sntprintf_s(tmp, _countof(tmp), _T("pe基础信息，文件路径:%s"), filepath);
+	_sntprintf_s(tmp, _countof(tmp), _T("pe基础信息，文件路径:%s"), winpetoolfile::filepath);
 	SetWindowText(dadjubing, tmp);
 
 	PIMAGE_DOS_HEADER pedosheader = (PIMAGE_DOS_HEADER)filedata;
@@ -86,7 +99,7 @@ int showpequduaninfo(char* filedata, HWND dadjubing,int id)
 		MessageBox(NULL, TEXT("文件内容为空"), TEXT("error"), NULL);
 		return 0;
 	}
-	_sntprintf_s(tmp, _countof(tmp), _T("pe区段信息，文件路径:%s"), filepath);
+	_sntprintf_s(tmp, _countof(tmp), _T("pe区段信息，文件路径:%s"), winpetoolfile::filepath);
 	SetWindowText(dadjubing, tmp);
 
 	LV_ITEM vitem;
@@ -165,7 +178,7 @@ int showpemuluinfo(char* filedata, HWND dadjubing)
 		MessageBox(NULL, TEXT("文件内容为空"), TEXT("error"), NULL);
 		return 0;
 	}
-	_sntprintf_s(tmp, _countof(tmp), _T("pe目录信息，文件路径:%s"), filepath);
+	_sntprintf_s(tmp, _countof(tmp), _T("pe目录信息，文件路径:%s"), winpetoolfile::filepath);
 	SetWindowText(dadjubing, tmp);
 
 	PIMAGE_DOS_HEADER pedosheader = (PIMAGE_DOS_HEADER)filedata;
@@ -234,7 +247,7 @@ int showpemuluinfo(char* filedata, HWND dadjubing)
 
 int showpedaochubiaoinfo(char* filedata, HWND dadjubing)
 {
-	_sntprintf_s(tmp, _countof(tmp), _T("导入表信息，文件路径:%s"), filepath);
+	_sntprintf_s(tmp, _countof(tmp), _T("导入表信息，文件路径:%s"), winpetoolfile::filepath);
 	SetWindowText(dadjubing, tmp);
 	daochubiaojiexiinfile(filedata, dadjubing);
 	return 1;
@@ -242,7 +255,7 @@ int showpedaochubiaoinfo(char* filedata, HWND dadjubing)
 
 int showpedaorubiaoinfo(char* filedata, HWND dadjubing)
 {
-	_sntprintf_s(tmp, _countof(tmp), _T("导入表信息，文件路径:%s"), filepath);
+	_sntprintf_s(tmp, _countof(tmp), _T("导入表信息，文件路径:%s"), winpetoolfile::filepath);
 	SetWindowText(dadjubing, tmp);
 	jiexidaorubiaoinfile(filedata, dadjubing);
 	return 1;
@@ -250,7 +263,7 @@ int showpedaorubiaoinfo(char* filedata, HWND dadjubing)
 
 int showpecdwbiaoinfo(char* filedata, HWND dadjubing)
 {
-	_sntprintf_s(tmp, _countof(tmp), _T("重定位表信息，文件路径:%s"), filepath);
+	_sntprintf_s(tmp, _countof(tmp), _T("重定位表信息，文件路径:%s"), winpetoolfile::filepath);
 	SetWindowText(dadjubing, tmp);
 	filechongdingweibiao(filedata, dadjubing);
 	return 1;
@@ -258,7 +271,7 @@ int showpecdwbiaoinfo(char* filedata, HWND dadjubing)
 
 int showpeziyuanbiaoinfo(char* filedata, HWND dadjubing,int id)
 {
-	_sntprintf_s(tmp, _countof(tmp), _T("资源表信息，文件路径:%s"), filepath);
+	_sntprintf_s(tmp, _countof(tmp), _T("资源表信息，文件路径:%s"), winpetoolfile::filepath);
 	SetWindowText(dadjubing, tmp);
 	ziyuanbiaojiexiinfile(filedata, dadjubing, id);
 	return 1;

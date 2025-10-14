@@ -1,5 +1,7 @@
 #pragma once
-#include "framework.h"
+//#include "framework.h"
+#include <windows.h>
+
 int showpeui(_In_ HINSTANCE hInstance, HWND dadjubing);
 int showpequduanui(_In_ HINSTANCE hInstance);
 int showpequmuluui(_In_ HINSTANCE hInstance);
@@ -13,6 +15,8 @@ int apiaddquduaninmemory(char*& memdata);
 int apimovcdwbiaoinmem(char*& memdata);
 int apimovedaochubiaoinmem(char*& memdata);
 int apimovedaorubiaoinmem(char*& memdata);
+
+int apireadsrctoshell(char* memdata,TCHAR * shellfilepath);
 
 int apimemoryquduanattcak(char* memdata, char* quduan);
 int apidaorubiaoattackinmem(char* &memdata, char* dllname, char* dllfun);

@@ -1,15 +1,33 @@
+
+#include <windows.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include "tool.h"
+#include "消息处理函数.h"
+#include "resource.h"
+#include <CommCtrl.h>
+#include "新增区段.h"
+#include "重定位表操作.h"
+#include "导出表操作.h"
+#include "导入表操作.h"
+#include "注入代码.h"
+#include "文件操作.h"
+#include "读取程序加密后附加.h"
+#include <string>
 #include "pe功能总控.h"
 
-char* tmpmemdata = NULL;
 int lastquduanisfree = 0;
-char* tmp = NULL;
 int start = 0;
-extern TCHAR filepath[MAX_PATH];
+extern int size;
+namespace winpetoolfile {
+	extern TCHAR filepath[MAX_PATH];
+}
+
 
 int showpeui(_In_ HINSTANCE hInstance,HWND dadjubing)
 {
 	TCHAR tmp[MAX_PATH] = _T("");
-	_sntprintf_s(tmp, _countof(tmp), _T("pe工具—by weizhi39，已选择的文件路径:%s"), filepath);
+	_sntprintf_s(tmp, _countof(tmp), _T("pe工具—by weizhi39，已选择的文件路径:%s"), winpetoolfile::filepath);
 	SetWindowText(dadjubing, tmp);
 	INT_PTR dialogResult = DialogBox(
 		hInstance,  // handle to module					
@@ -95,8 +113,8 @@ int showpeinfo(HWND dadjubing, TCHAR* outPath, DWORD outSize)
 }
 
 int apiaddquduaninmemory(char* &memdata) {
-	tmp = memdata;
-	tmpmemdata = addquduaninmemory(memdata);
+	char* tmp = memdata;
+	char* tmpmemdata = addquduaninmemory(memdata,0x1000);
 	if (tmpmemdata) {
 		memdata = tmpmemdata;
 		free(tmp);
@@ -137,6 +155,18 @@ int apimovedaorubiaoinmem(char*& memdata) {
 	return 1;
 }
 
+int apireadsrctoshell(char* memdata, TCHAR* shellfilepath)
+{
+	char* shellfiledata = duqufile(shellfilepath);
+	char* shellmemdata = pefiletomemory(shellfiledata);
+	char* newshelldata=readsrctoshell(memdata, shellmemdata);
+	char* newshellfiledata = pememorytofile(newshelldata);
+	TCHAR filepath[] = TEXT("./newshell.exe");
+	savefile(newshellfiledata, filepath, size);
+	MessageBox(NULL, TEXT("已将加壳后程序保存到./newshell.exe"), TEXT("info"), NULL);
+	return 1;
+}
+
 int apimemoryquduanattcak(char* memdata, char* quduan) {
 	std::string asciiText = quduan;
 	int number = atoi(asciiText.c_str());
@@ -167,7 +197,7 @@ bool openpefile(HWND dadjubing, TCHAR* outPath, DWORD outSize)
 	pefileinfo.lpstrDefExt = _T("exe");              // 默认扩展名
 
 	if (GetOpenFileName(&pefileinfo)) {
-		MessageBox(dadjubing, outPath, _T("已选择的 PE 文件"), MB_OK);
+		//MessageBox(dadjubing, outPath, _T("已选择的 PE 文件"), MB_OK);
 		return true;
 	}
 	return false;

@@ -1,5 +1,6 @@
 #pragma once
-#include "framework.h"
+//#include "framework.h"
+#include <windows.h>
 int showpejichuinfo(char* filedata, HWND dadjubing);
 int showpequduaninfo(char* filedata, HWND dadjubing,int id);
 int showpemuluinfo(char* filedata, HWND dadjubing);

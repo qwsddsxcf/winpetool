@@ -7,8 +7,6 @@
 #define IDS_APP_TITLE                   103
 #define IDM_ABOUT                       104
 #define IDM_EXIT                        105
-#define IDI_MYWIN32APICHENGXU           107
-#define IDI_SMALL                       108
 #define IDC_MYWIN32APICHENGXU           109
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG1_main                129
@@ -21,6 +19,8 @@
 #define IDI_ICON1                       142
 #define IDI_ICON1_my1                   142
 #define IDD_DIALOG1_aboutthis           143
+#define IDI_ICON1_my2                   143
+#define IDI_ICON2                       145
 #define IDC_BUTTON_pesee                1000
 #define IDC_BUTTON_exit                 1001
 #define IDC_BUTTON4                     1003
@@ -33,7 +33,6 @@
 #define IDC_LIST4                       1009
 #define IDC_LIST4_info                  1009
 #define IDC_EDIT1                       1010
-#define IDC_BUTTON_pesee3_attackdll2    1010
 #define IDC_BUTTON_mainshuaxin          1010
 #define IDC_EDIT2                       1011
 #define IDC_EDIT3                       1012
@@ -88,6 +87,7 @@
 #define IDC_EDIT31                      1047
 #define IDC_EDIT32                      1048
 #define IDC_BUTTON1_daoruinfo           1049
+#define IDC_BUTTON_jiake                1049
 #define IDC_BUTTON1_ziyuaninfo          1050
 #define IDC_BUTTON1_cdwinfo             1051
 #define IDC_BUTTON1_iatinfo             1052
@@ -98,9 +98,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        144
+#define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1046
+#define _APS_NEXT_CONTROL_VALUE         1050
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

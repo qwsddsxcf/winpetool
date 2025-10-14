@@ -1,4 +1,13 @@
-#include "进程信息展示.h"
+//#include "进程信息展示.h"
+#include <windows.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include "resource.h"
+#include "tool.h"
+#include <Psapi.h>
+#include <CommCtrl.h>
+#include <TlHelp32.h>
+
 struct ModuleInfo
 {
 	TCHAR szModuleName[MAX_PATH];

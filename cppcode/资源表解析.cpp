@@ -1,5 +1,10 @@
 
-#include "framework.h"
+//#include "framework.h"
+#include <windows.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include "resource.h"
+#include "tool.h"
 void ziyuanbiaojiexiinfile(char* filedata, HWND dadjubing,int id)
 {
 	PIMAGE_DOS_HEADER pedosheader = (PIMAGE_DOS_HEADER)filedata;

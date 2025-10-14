@@ -1,6 +1,11 @@
 
-#include "framework.h"
+//#include "framework.h"
 #pragma warning(disable : 4996)
+#include <windows.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include "resource.h"
+#include "tool.h"
 ////75e11600
 //rukou:00021000
 void memoryquduanattcak(char* memdata,int quduan)

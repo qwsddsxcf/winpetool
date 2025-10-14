@@ -2,9 +2,11 @@
 // mywin32apichengxu.cpp : 定义应用程序的入口点。
 //
 
-#include "framework.h"
+//#include "framework.h"
 #include "mywin32apichengxu.h"
-
+#include <windows.h>
+#include <stdlib.h>
+#include "消息处理函数.h"
 
 #define MAX_LOADSTRING 100
 _In_ HINSTANCE hAppInstance;

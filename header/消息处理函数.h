@@ -1,7 +1,8 @@
 #pragma once
-#include "framework.h"
-
-int freeneicun(int,int,int);
+//#include "framework.h"
+#include <windows.h>
+#include <stdlib.h>
+int freeneicun(int,int);
 BOOL CALLBACK mainfun(
 	HWND hwndDlg,  // handle to dialog box			
 	UINT uMsg,     // message			

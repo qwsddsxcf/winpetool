@@ -1,5 +1,10 @@
 
-#include "framework.h"
+//#include "framework.h"
+#include <windows.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include "resource.h"
+#include "tool.h"
 int movcdwbiaoinmem(char* memdata,int start)
 {
 

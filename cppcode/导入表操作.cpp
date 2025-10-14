@@ -1,4 +1,8 @@
-#include "framework.h"
+//#include "framework.h"
+#include <windows.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include "tool.h"
 #pragma warning(disable : 4996)
 int daorubiaoattackinmem(char* memdata,int start,char* dllname,char* dllfun)
 {

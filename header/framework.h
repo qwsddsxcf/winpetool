@@ -33,6 +33,7 @@
 #include "消息处理函数.h"
 #include "pe功能总控.h"
 #include "pe基础信息展示.h"
+#include "读取程序加密后附加.h"
 #include "resource.h"
 #include<commctrl.h>
 #include <commdlg.h>

@@ -1,5 +1,10 @@
-#include "ui初始化.h"
-
+//#include "ui初始化.h"
+#include <windows.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include "tool.h"
+#include "resource.h"
+#include <CommCtrl.h>
 void initmoudlelist(HWND hwndDlg, int id)
 {
 	HWND moudlejubing;

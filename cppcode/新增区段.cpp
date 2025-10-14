@@ -1,7 +1,13 @@
 
-#include "framework.h"
+//#include "framework.h"
+#include <windows.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include "resource.h"
+#include "tool.h"
+#include "ÐÂÔöÇø¶Î.h"
 #pragma warning(disable : 4996)
-char* addquduaninmemory(char* memdata)
+char* addquduaninmemory(char* memdata, int newquduansize)
 {
 	int quduansize = 40;
 	PIMAGE_DOS_HEADER pedosheader = (PIMAGE_DOS_HEADER)memdata;
@@ -24,8 +30,8 @@ char* addquduaninmemory(char* memdata)
 		return NULL;
 	}
 
-	int newquduanmemsize = 0x800;
-	int newquduanfilesize = 0x1600;
+	int newquduanmemsize = newquduansize;
+	int newquduanfilesize = newquduansize+0x500;
 	int size1 = pequduanheader[pequduannum - 1].VirtualAddress + pequduanheader[pequduannum - 1].Misc.VirtualSize;
 	int size2 = pequduanheader[pequduannum - 1].PointerToRawData + pequduanheader[pequduannum - 1].SizeOfRawData;
 	int newquduanmemaddress = duiqi(size1,pekexuanheader->SectionAlignment);
@@ -34,7 +40,7 @@ char* addquduaninmemory(char* memdata)
 	/*printf("%x\n", newquduanmemaddress);
 	printf("%x\n", newquduanfileaddress);*/
 	
-	int newsize = newquduanmemaddress + 0x2000;
+	int newsize = newquduanmemaddress + newquduansize+ 0x1000;
 
 	char* newmemdata = (char*)malloc(newsize);
 	int oldsize = pekexuanheader->SizeOfImage;

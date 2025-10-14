@@ -1,13 +1,7 @@
 
-//#include "framework.h"
-#include <windows.h>
-#include <stdlib.h>
-#include <tchar.h>
-#include "resource.h"
-#include "tool.h"
-#include <stdio.h>
+#include "文件操作.h"
 #pragma warning(disable : 4996)
-int size=0;
+int size = 0;
 char* duqufile(TCHAR* filepath)
 {
 	FILE* file = _wfopen(filepath, L"rb");
@@ -24,17 +18,17 @@ char* duqufile(TCHAR* filepath)
 	//将文件内容存入缓冲区并返回
 	char* filedata = (char*)malloc(sizeof(char) * filesize);
 	fread(filedata, 1, filesize, file);
-	printf("读取文件成功！\n");
+	//printf("读取文件成功！\n");
 	/*printf("%syyyyyy\n", filedata);*/
 	return filedata;
 }
 
 char* pefiletomemory(char* filedata)
 {
-	PIMAGE_DOS_HEADER pedosheader= (PIMAGE_DOS_HEADER)filedata;
-	PIMAGE_NT_HEADERS32 pepeheader = (PIMAGE_NT_HEADERS32)(filedata+pedosheader->e_lfanew);
+	PIMAGE_DOS_HEADER pedosheader = (PIMAGE_DOS_HEADER)filedata;
+	PIMAGE_NT_HEADERS32 pepeheader = (PIMAGE_NT_HEADERS32)(filedata + pedosheader->e_lfanew);
 	PIMAGE_FILE_HEADER pefileheader = &pepeheader->FileHeader;
-	
+
 	PIMAGE_OPTIONAL_HEADER32 pekexuanheader = &pepeheader->OptionalHeader;
 	PIMAGE_SECTION_HEADER pequduanheader = PIMAGE_SECTION_HEADER((char*)pekexuanheader + pefileheader->SizeOfOptionalHeader);
 
@@ -49,7 +43,7 @@ char* pefiletomemory(char* filedata)
 		fprintf(stderr, "malloc failed, SizeOfImage=%u\n", pekexuanheader->SizeOfImage);
 		return NULL;
 	}
-	memset(memorydata, 0,pekexuanheader->SizeOfImage);
+	memset(memorydata, 0, pekexuanheader->SizeOfImage);
 
 	memcpy(memorydata, filedata, pekexuanheader->SizeOfHeaders);
 
@@ -98,7 +92,7 @@ char* pememorytofile(char* memdata)
 
 }
 
-void savefile(char* filedata, TCHAR* path,int size)
+void savefile(char* filedata, TCHAR* path, int size)
 {
 	FILE* file = _wfopen(path, L"wb");
 	//读取文件
@@ -108,7 +102,7 @@ void savefile(char* filedata, TCHAR* path,int size)
 		return;
 	}
 	fwrite(filedata, 1, size, file);
-	printf("已成功将文件内容保存！");
+	//printf("已成功将文件内容保存！");
 
 }
 
