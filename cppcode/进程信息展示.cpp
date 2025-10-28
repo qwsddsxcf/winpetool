@@ -4,6 +4,7 @@
 #include <tchar.h>
 #include "resource.h"
 #include "tool.h"
+#include "pe功能总控.h"
 #include <Psapi.h>
 #include <CommCtrl.h>
 #include <TlHelp32.h>
@@ -13,6 +14,16 @@ struct ModuleInfo
 	TCHAR szModuleName[MAX_PATH];
 	TCHAR szBaseAddress[32];
 };
+namespace winpetoolfile {
+	extern TCHAR filepath[MAX_PATH];
+}
+namespace winpejinchenginfo{
+	TCHAR szPID[32] = { 0 };
+	int ischosejincheng = 0;
+	int isrunjinchengzhuru = 0;
+	int isiathook = 1;
+	char* gongxiangneicun=NULL;
+}
 
 int showjinchengmaininfo(HWND dadjubing, int id)
 {
@@ -96,7 +107,7 @@ int showmorejinchengmaininfo(LPARAM moreinfo, HWND dadjubing,int id)
 	int hang = pItemActivate->iItem;
 	if (hang == -1)return 0;
 	TCHAR szProcessName[MAX_PATH] = { 0 };  // 进程名（列0）
-	TCHAR szPID[32] = { 0 };                // PID（列1）
+	              // PID（列1）
 	TCHAR szBaseAddr[32] = { 0 };            // 镜像基址（列2）
 	TCHAR szImageSize[32] = { 0 };
 
@@ -108,12 +119,20 @@ int showmorejinchengmaininfo(LPARAM moreinfo, HWND dadjubing,int id)
 		MAX_PATH            // 缓冲区大小
 	);
 
-	ListView_GetItemText(pNMHDR->hwndFrom, hang, 1, szPID, _countof(szPID));
+	ListView_GetItemText(pNMHDR->hwndFrom, hang, 1, winpejinchenginfo::szPID, _countof(winpejinchenginfo::szPID));
 	ListView_GetItemText(pNMHDR->hwndFrom, hang, 2, szBaseAddr, _countof(szBaseAddr));
 	ListView_GetItemText(pNMHDR->hwndFrom, hang, 3, szImageSize, _countof(szImageSize));
 
+	TCHAR tmp[MAX_PATH] = _T("");
+	_sntprintf_s(tmp, _countof(tmp), _T("pe工具—by weizhi39，已选择的文件路径:%s,   已选择的进程id:%s"), winpetoolfile::filepath, winpejinchenginfo::szPID);
+	SetWindowText(dadjubing, tmp);
+	winpejinchenginfo::ischosejincheng = 1;
+	winpejinchenginfo::isrunjinchengzhuru = 0;
+	HWND hButton = GetDlgItem(dadjubing, IDC_BUTTON5_funjiankong);
+	SetWindowText(hButton, L"函数监控");
+	apijinchengcaozuo(5);
 
-	DWORD mokuai = _ttoi(szPID);
+	DWORD mokuai = _ttoi(winpejinchenginfo::szPID);
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, mokuai);
 	MODULEENTRY32 me32 = { 0 };
 	me32.dwSize = sizeof(MODULEENTRY32);

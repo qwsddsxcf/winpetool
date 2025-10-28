@@ -1,4 +1,3 @@
-
 #include <windows.h>
 #include <stdlib.h>
 #include <tchar.h>
@@ -9,6 +8,7 @@
 #include "进程信息展示.h"
 #include "文件操作.h"
 #include "ui初始化.h"
+#include "检查.h"
 #include <CommCtrl.h>
 
 extern _In_ HINSTANCE hAppInstance;
@@ -29,10 +29,13 @@ namespace winpetoolkey {
 	int isopenpeui;
 	int showui = -1;
 	int ischosefile = 0;
+	int isrundllzhuru;
 }
-
-
-
+namespace winpejinchenginfo {
+	extern int ischosejincheng;
+	extern int isrunjinchengzhuru;
+	extern int isiathook;
+}
 void CloseAllWindows()
 {
 
@@ -52,8 +55,6 @@ void CloseAllWindows()
 	}
 	winpetoolkey::isopenpeui = 0;
 }
-
-
 
 int freeneicun(int cfiledata,int cmemdata)
 {
@@ -79,24 +80,24 @@ BOOL CALLBACK mainfun(
 	LPARAM lParam  // second message parameter			
 )
 {
-
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
-
+		apichuangjiangoongxiangmem();
 		initmoudlelist(hwndDlg, IDC_LIST1_model);
 		initshowlist(hwndDlg, IDC_LIST4_info);
-		//insertdemodata(hwndDlg, IDC_LIST1_model);
 		showjinchengmaininfo(hwndDlg, IDC_LIST1_model);
 		settubiao(hAppInstance, hwndDlg);
 		return true;
 	case WM_CLOSE:
 		EndDialog(hwndDlg, 0);
+		apijinchengcaozuo(5);
 		exit(0);
 		return TRUE;
 	case WM_SYSCOMMAND:
 		if (wParam == SC_CLOSE) { // 检查是否为关闭指令
 			EndDialog(hwndDlg, 0);
+			apijinchengcaozuo(5);
 			exit(0);
 			return true;
 		}
@@ -117,6 +118,7 @@ BOOL CALLBACK mainfun(
 		{
 		case IDC_BUTTON_exit:
 			EndDialog(hwndDlg, 0);
+			apijinchengcaozuo(5);
 			exit(0);
 			return TRUE;
 		case IDC_BUTTON_mainshuaxin:
@@ -156,6 +158,7 @@ BOOL CALLBACK mainfun(
 		case IDC_BUTTON_pesee3_attackdll:
 			//showpedllui
 			if (winpetoolkey::ischosefile) {
+				winpetoolkey::isrundllzhuru = 0;
 				showpedllui(hAppInstance);
 			}
 			else {
@@ -180,6 +183,63 @@ BOOL CALLBACK mainfun(
 			}
 			return true;
 		}
+		case IDC_BUTTON2_dongdllzhuru: {
+			if (winpejinchenginfo::ischosejincheng)
+			{
+				winpetoolkey::isrundllzhuru = 1;
+				showjinchengdllui(hAppInstance);
+				return true;
+			}else{
+				MessageBox(NULL, TEXT("请先选择进程！"), TEXT("info"), NULL);
+			}
+			return true;
+		}
+		case IDC_BUTTON5_funjiankong: {
+			if (!winpejinchenginfo::ischosejincheng) {
+				MessageBox(NULL, TEXT("请先选择进程！"), TEXT("info"), NULL);
+				return true;
+			}
+			TCHAR shellfilepath[MAX_PATH] = TEXT("");
+			if (!winpejinchenginfo::isrunjinchengzhuru && openpefile(hwndDlg, shellfilepath, MAX_PATH)) {
+				if(!apijinchengneicunzhuru(shellfilepath)) return true;
+			}
+			HWND hButton = GetDlgItem(hwndDlg, IDC_BUTTON5_funjiankong);
+			if (winpejinchenginfo::isiathook) {
+				winpejinchenginfo::isiathook = 0;
+				apijinchengcaozuo(1);
+				SetWindowText(hButton, L"取消监控");
+			}
+			else {
+				winpejinchenginfo::isiathook = 1;
+				apijinchengcaozuo(2);
+				SetWindowText(hButton, L"函数监控");
+			}
+			return true;
+		}
+		case IDC_BUTTON6_funcall: {
+			if (!winpejinchenginfo::ischosejincheng) {
+				MessageBox(NULL, TEXT("请先选择进程！"), TEXT("info"), NULL);
+				return true;
+			}
+			TCHAR shellfilepath[MAX_PATH] = TEXT("");
+			if (!winpejinchenginfo::isrunjinchengzhuru && openpefile(hwndDlg, shellfilepath, MAX_PATH)) {
+				if (!apijinchengneicunzhuru(shellfilepath)) return true;
+			}
+			apijinchengcaozuo(3);
+			return true;
+		}
+		case IDC_BUTTON7_runcode: {
+			if (!winpejinchenginfo::ischosejincheng) {
+				MessageBox(NULL, TEXT("请先选择进程！"), TEXT("info"), NULL);
+				return true;
+			}
+			TCHAR shellfilepath[MAX_PATH] = TEXT("");
+			if (!winpejinchenginfo::isrunjinchengzhuru && openpefile(hwndDlg, shellfilepath, MAX_PATH)) {
+				if (!apijinchengneicunzhuru(shellfilepath)) return true;
+			}
+			apijinchengcaozuo(4);
+			return true;
+		}
 		default:
 			break;
 		}
@@ -201,6 +261,12 @@ BOOL CALLBACK peuifun(
 	case WM_INITDIALOG:
 		winpetooljubing::peuijubing = hwndDlg;
 		winpetoolfile::filedata = duqufile(winpetoolfile::filepath);
+		if (!checkiswin32pe(winpetoolfile::filedata)) {
+			winpetoolkey::ischosefile = 0;
+			MessageBox(NULL, TEXT("该文件不是win32pe文件,请重新选择！"), TEXT("info"), NULL);
+			EndDialog(hwndDlg, 0);
+			return true;
+		}
 		if (winpetoolfile::filedata) {
 			winpetoolfile::memdata = pefiletomemory(winpetoolfile::filedata);
 			showpejichuinfo(winpetoolfile::filedata, hwndDlg);
@@ -226,7 +292,6 @@ BOOL CALLBACK peuifun(
 		{
 		case IDC_BUTTON5_peexit:
 			EndDialog(hwndDlg, 0);
-			
 			return TRUE;
 		case IDC_BUTTON3_pequduan:
 			if (winpetooljubing::pequduanjubing) {

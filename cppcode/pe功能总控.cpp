@@ -15,19 +15,25 @@
 #include "读取程序加密后附加.h"
 #include <string>
 #include "pe功能总控.h"
-
+#include "检查.h"
+#include "进程动态dll注入.h"
+#pragma warning(disable : 4996)
 int lastquduanisfree = 0;
 int start = 0;
 extern int size;
 namespace winpetoolfile {
 	extern TCHAR filepath[MAX_PATH];
 }
-
+namespace winpejinchenginfo {
+	extern TCHAR szPID[32];
+	extern int isrunjinchengzhuru;
+	extern char* gongxiangneicun;
+}
 
 int showpeui(_In_ HINSTANCE hInstance,HWND dadjubing)
 {
 	TCHAR tmp[MAX_PATH] = _T("");
-	_sntprintf_s(tmp, _countof(tmp), _T("pe工具—by weizhi39，已选择的文件路径:%s"), winpetoolfile::filepath);
+	_sntprintf_s(tmp, _countof(tmp), _T("pe工具—by weizhi39，已选择的文件路径:%s,     已选择的进程id:%s"), winpetoolfile::filepath, winpejinchenginfo::szPID);
 	SetWindowText(dadjubing, tmp);
 	INT_PTR dialogResult = DialogBox(
 		hInstance,  // handle to module					
@@ -73,7 +79,6 @@ int showpebiaoinfoui(HINSTANCE hInstance)
 }
 
 
-
 int showpedllui(_In_ HINSTANCE hInstance)
 {
 	INT_PTR dialogResult = DialogBox(
@@ -92,6 +97,78 @@ int showpequduanshuruui(_In_ HINSTANCE hInstance)
 		NULL,      // handle to owner window					
 		pequduanshurufun  // dialog box procedure					
 	);
+	return 1;
+}
+
+int showjinchengdllui(_In_ HINSTANCE hInstance)
+{
+	INT_PTR dialogResult = DialogBox(
+		hInstance,  // handle to module					
+		MAKEINTRESOURCE(IDD_DIALOG1_dll),   // dialog box template					
+		NULL,      // handle to owner window					
+		pedllfun  // dialog box procedure					
+	);
+	return 1;
+}
+int apichuangjiangoongxiangmem() {
+	HANDLE hMap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, 1024, L"weizhihack");
+	winpejinchenginfo::gongxiangneicun = (char*)MapViewOfFile(hMap, FILE_MAP_ALL_ACCESS, 0, 0, 1024);
+	return 1;
+}
+int apijinchengneicunzhuru(TCHAR * jinchengshellpath) {
+
+	STARTUPINFO si = { 0 };
+	PROCESS_INFORMATION pi;
+
+	char* shellfiledata = duqufile(jinchengshellpath);
+	if (!checkiswin32pe(shellfiledata)) {
+		MessageBox(NULL, TEXT("该文件不是进程shell文件,请重新选择！"), TEXT("info"), NULL);
+		return 0;
+	}
+	si.cb = sizeof(si);
+	TCHAR tmp[MAX_PATH];
+	_sntprintf_s(tmp, _countof(tmp), _T("%s  %s"), jinchengshellpath,winpejinchenginfo::szPID);
+
+	BOOL res = CreateProcess(
+		NULL,
+		tmp,
+		NULL,
+		NULL,
+		FALSE,
+		CREATE_NEW_CONSOLE,
+		NULL,
+		NULL, &si, &pi);
+	if (!res) {
+		return 0;
+	}
+	winpejinchenginfo::isrunjinchengzhuru = 1;
+
+	return 1;
+}
+
+int apijinchengcaozuo(int id) {
+	switch (id)
+	{
+	case 1:
+		sprintf(winpejinchenginfo::gongxiangneicun, "%s", "startiathook");
+		break;
+	case 2:
+		sprintf(winpejinchenginfo::gongxiangneicun, "%s", "stopiathook");
+		break;
+	case 3:
+		sprintf(winpejinchenginfo::gongxiangneicun, "%s", "diaoyong");
+		break;
+	case 4:
+		sprintf(winpejinchenginfo::gongxiangneicun, "%s", "runcode");
+		break;
+	case 5:
+		sprintf(winpejinchenginfo::gongxiangneicun, "%s", "exit");
+		return 1;
+		break;
+	default:
+		break;
+	}
+	MessageBox(NULL,TEXT("操作成功"), TEXT("成功"), NULL);
 	return 1;
 }
 
@@ -158,6 +235,10 @@ int apimovedaorubiaoinmem(char*& memdata) {
 int apireadsrctoshell(char* memdata, TCHAR* shellfilepath)
 {
 	char* shellfiledata = duqufile(shellfilepath);
+	if (!checkiswin32pe(shellfiledata)) {
+		MessageBox(NULL, TEXT("该文件不是壳shell文件,请重新选择！"), TEXT("info"), NULL);
+		return 0;
+	}
 	char* shellmemdata = pefiletomemory(shellfiledata);
 	char* newshelldata=readsrctoshell(memdata, shellmemdata);
 	char* newshellfiledata = pememorytofile(newshelldata);
@@ -184,6 +265,19 @@ int apidaorubiaoattackinmem(char* &memdata,char* dllname,char* dllfun) {
 	start = tmp + start;
 	return 1;
 }
+
+int apijinchengzhurudll(char* dllpath) {
+	int tmppid = 0;
+	swscanf_s(winpejinchenginfo::szPID, L"%d", &tmppid);
+	if (tmppid == 0) {
+		return 0;
+	}
+	if (jinchengzhurudll(tmppid, dllpath)) {
+		return 1;
+	}
+	return 0;
+}
+
 bool openpefile(HWND dadjubing, TCHAR* outPath, DWORD outSize)
 {
 	OPENFILENAME pefileinfo{0};

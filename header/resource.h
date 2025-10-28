@@ -90,7 +90,12 @@
 #define IDC_BUTTON_jiake                1049
 #define IDC_BUTTON1_ziyuaninfo          1050
 #define IDC_BUTTON1_cdwinfo             1051
+#define IDC_BUTTON2_dongdllzhuru        1051
 #define IDC_BUTTON1_iatinfo             1052
+#define IDC_BUTTON5_funjiankong         1053
+#define IDC_BUTTON6_funcall             1054
+#define IDC_BUTTON7                     1055
+#define IDC_BUTTON7_runcode             1055
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -100,7 +105,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1050
+#define _APS_NEXT_CONTROL_VALUE         1056
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

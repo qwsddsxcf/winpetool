@@ -21,10 +21,9 @@ char* addquduaninmemory(char* memdata, int newquduansize)
 	int quduanend = int((char*)pequduanheader+ quduansize * pequduannum-(int)memdata);
 	int freesize = peheaderend - quduanend;
 
-	//printf("%hhx\n",freesize);
+
 	if (freesize < 80)
 	{
-		/*printf("多余空间不够添加一个区段！\n");*/
 		MessageBox(NULL, TEXT("多余空间不够添加一个区段"), TEXT("info"), NULL);
 	;
 		return NULL;
@@ -37,8 +36,6 @@ char* addquduaninmemory(char* memdata, int newquduansize)
 	int newquduanmemaddress = duiqi(size1,pekexuanheader->SectionAlignment);
 	int newquduanfileaddress= duiqi(size2, pekexuanheader->FileAlignment);
 
-	/*printf("%x\n", newquduanmemaddress);
-	printf("%x\n", newquduanfileaddress);*/
 	
 	int newsize = newquduanmemaddress + newquduansize+ 0x1000;
 
@@ -61,7 +58,7 @@ char* addquduaninmemory(char* memdata, int newquduansize)
 	newpequduanheader[pequduannum].Characteristics = 0x60000020;
 	newpequduanheader[pequduannum].Misc.PhysicalAddress = newpequduanheader[pequduannum - 1].Misc.PhysicalAddress;
 	newpequduanheader[pequduannum].Misc.VirtualSize = newquduanmemsize;
-	//newpequduanheader[pequduannum].Name = newpequduanheader[pequduannum - 1].Name;
+	
 	memcpy(newpequduanheader[pequduannum].Name, ".newsec", 8);
 	newpequduanheader[pequduannum].NumberOfLinenumbers = newpequduanheader[pequduannum - 1].NumberOfLinenumbers;
 	newpequduanheader[pequduannum].NumberOfRelocations = newpequduanheader[pequduannum - 1].NumberOfRelocations;

@@ -24,6 +24,7 @@ namespace winpetoolkey {
 	extern int isopenpeui;
 	extern int showui;
 	extern int ischosefile;
+	extern int isrundllzhuru;
 }
 extern _In_ HINSTANCE hAppInstance;
 
@@ -198,14 +199,25 @@ BOOL CALLBACK pedllfun(
 		case IDOK_dllshuruqueding: {
 			char* dllname = getshuruinfothentoascii(hwndDlg, IDC_EDIT1_dllname);
 			char* dllfun = getshuruinfothentoascii(hwndDlg, IDC_EDIT2_dllfun);
-			apidaorubiaoattackinmem(winpetoolfile::memdata, dllname, dllfun);
+			if (winpetoolkey::isrundllzhuru) {
+				apijinchengzhurudll(dllname);
+			}
+			else {
+				apidaorubiaoattackinmem(winpetoolfile::memdata, dllname, dllfun);
+			}
+			
 			EndDialog(hwndDlg, 0);
 			return true;
 		}
 		case IDC_BUTTON1_demodll: {
 			char* dllname = (char*)"InjectDll.dll";
 			char* dllfun = (char*)"ExportFunction";
-			apidaorubiaoattackinmem(winpetoolfile::memdata, dllname, dllfun);
+			if (winpetoolkey::isrundllzhuru) {
+				apijinchengzhurudll(dllname);
+			}
+			else {
+				apidaorubiaoattackinmem(winpetoolfile::memdata, dllname, dllfun);
+			}
 			EndDialog(hwndDlg, 0);
 			return true;
 		}
