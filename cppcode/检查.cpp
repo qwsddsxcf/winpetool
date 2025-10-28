@@ -1,4 +1,4 @@
-#include "¼ì²é.h"
+#include "æ£€æŸ¥.h"
 #include <windows.h>
 #include <stdio.h>
 
@@ -13,7 +13,6 @@ int checkiswin32pe(char* filedata)
         return 0;
     }
 
-    // ¼ì²éÊÇ·ñÎª32Î»PEÎÄ¼þ
     if (nt_headers->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
         return 0;
     }
