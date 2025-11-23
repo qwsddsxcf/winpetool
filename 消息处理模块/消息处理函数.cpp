@@ -83,15 +83,16 @@ BOOL CALLBACK mainfun(
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
-		apichuangjiangoongxiangmem();
+		apichuangjiangoongxiangmem();//创建进程共享内存，用于进程相关操作功能
+		//初始化list组件
 		initmoudlelist(hwndDlg, IDC_LIST1_model);
 		initshowlist(hwndDlg, IDC_LIST4_info);
-		showjinchengmaininfo(hwndDlg, IDC_LIST1_model);
-		settubiao(hAppInstance, hwndDlg);
+		showjinchengmaininfo(hwndDlg, IDC_LIST1_model);//在list展示当前32进程
+		settubiao(hAppInstance, hwndDlg);//设置应用程序图标
 		return true;
 	case WM_CLOSE:
 		EndDialog(hwndDlg, 0);
-		apijinchengcaozuo(5);
+		apijinchengcaozuo(5);//结束时将共享内存值改为exit
 		exit(0);
 		return TRUE;
 	case WM_SYSCOMMAND:
@@ -104,7 +105,8 @@ BOOL CALLBACK mainfun(
 		return false;
 	case WM_NOTIFY:
 	{
-		NMHDR* moreinfo = (NMHDR*)(lParam);
+		//展示进程详细信息，如基址，模块
+		NMHDR* moreinfo = (NMHDR*)(lParam); //lParam中存储的是该动作的（点击）详细信息（多少行）
 		if (moreinfo->idFrom == IDC_LIST1_model && moreinfo->code == NM_CLICK) {
 			showmorejinchengmaininfo(lParam, hwndDlg, IDC_LIST4_info);
 			return true;
@@ -125,8 +127,9 @@ BOOL CALLBACK mainfun(
 			showjinchengmaininfo(hwndDlg, IDC_LIST1_model);
 			return true;
 		case IDC_BUTTON_pesee:
-			
+			//这里进行选择文件的操作，该操作是在打开pe查看敞口
 			if (openpefile(hwndDlg, winpetoolfile::filepath, _countof(winpetoolfile::filepath))) {
+				//这里检查是否已经选择了文件，已选择将关闭原来的窗口
 				if (winpetoolkey::isopenpeui) {
 					CloseAllWindows();
 				}

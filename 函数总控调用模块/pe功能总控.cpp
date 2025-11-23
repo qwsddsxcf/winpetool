@@ -320,12 +320,17 @@ BOOL savefilegetpath(HWND dadjubing, LPTSTR szFileName, DWORD nMaxFileName)
 
 int apifanhuibianmain(char *memdata,HWND dadjubing,int id)
 {
+	char tmpcode[] = { 0x8b,0x2c,0x15,0x12,0x13,0x14,0x15,0x8b,0x2c,0x25,0x12,0x13,0x14,0x15,0x8b,0xac,0x15,0x12,0x13,0x14,0x15 };
+
+
 	int pianyi = 0;
 	int base = 0;
 	HWND listjubing = GetDlgItem(dadjubing, id);
 	ListView_DeleteAllItems(listjubing);
 	toolgetperukoupianyi(memdata, pianyi, base);
-	if (fabnhuibianmain(base + pianyi, memdata + pianyi, 0x500, dadjubing, id)==1) {
+	//fabnhuibianmain(base + pianyi, memdata + pianyi, 0x100, dadjubing, id)
+	//fabnhuibianmain(base + pianyi, tmpcode, 21, dadjubing, id)==1
+	if (fabnhuibianmain(base + pianyi, memdata + pianyi, 0x200, dadjubing, id)==1) {
 		MessageBox(NULL, TEXT("反汇编成功"), TEXT("成功"), NULL);
 		return 1;
 	}

@@ -5,7 +5,7 @@ int apifanhuibianchoseopcodesizefun(char* erjinzhidata, char* outhuibian, int cu
 
 int apifanhuibianonebyteopcodechose(char* erjinzhidata,char* outhuibian, int curjizhi);
 int apifanhuibianonebyteopcode40to7f(char* erjinzhidata, char* outhuibian, int curjizhi);
-int apifanhuibianonebyteopcode81tobf(char* erjinzhidata, char* outhuibian, int curjizhi);
+int apifanhuibianonebyteopcode80tobf(char* erjinzhidata, char* outhuibian, int curjizhi);
 int apifanhuibianonebyteopcodec0toff(char* erjinzhidata, char* outhuibian, int curjizhi);
 
 

@@ -39,43 +39,48 @@ int toolgetmovadd(char* erjinzhidata, char* addstr, int index)
 
 int toolgetmoverjistr(char* erjinzhidata, char* tmpstr, unsigned char beforemod)
 {
+    //当需要第三个字节进行更细化的解析时调用，该函数传入要解析第三字节位置，返回解析了多少偏移
+    //并不累加返回当前第三字节
     unsigned char twoopcode = erjinzhidata[0];
     unsigned char firstmod = (twoopcode >> 6) & 0x03;
     unsigned char firstreg = (twoopcode >> 3) & 0x07;
     unsigned char firstrm = twoopcode & 0x07;
 
-
-    if (firstrm != 5) {
-        if (firstreg == 4) {
-            sprintf(tmpstr, "%s", reg32shunxu[firstrm]);
-        }
-        else {
-            sprintf(tmpstr, "%s+%s*%d", reg32shunxu[firstrm], reg32shunxu[firstreg], toolgetnummovetrue(firstmod));
-        }
-        return 0;
-    }
-    else {
-        char tmppianyi[20] = { 0 };
+    char tmppianyi[20] = { 0 };
         if (beforemod == 0) {
-            toolgettrue32byte(erjinzhidata + 1, tmppianyi, 4);
-            if (firstrm == 4) {
-                sprintf(tmpstr, "%s", tmppianyi);
+            //根据上一个的字节及解析的mod值，决定是否需要偏移
+            if (firstrm == 5) {
+                //当上一个字节的md为0 并且 该rm 满足为ebp时规则改变，ebp为空，且该模式下没有偏移变为4字节偏移
+                toolgettrue32byte(erjinzhidata + 1, tmppianyi, 4);
+                if (firstreg == 4) {
+                    sprintf(tmpstr, "%s", tmppianyi);
+                    return 4;
+                }
+                sprintf(tmpstr, "%s*%d+%s", reg32shunxu[firstreg], toolgetnummovetrue(firstmod),tmppianyi);
+                return 4;
             }
-            sprintf(tmpstr, "%s*%d+%s", reg32shunxu[firstreg], toolgetnummovetrue(firstmod), tmppianyi);
-            return 4;
+            //当reg为esp时为空，该规则保持不变
+            if (firstreg == 4) {
+                sprintf(tmpstr, "%s", reg32shunxu[firstrm]);
+                return 0;
+            }
+            sprintf(tmpstr, "%s+%s*%d", reg32shunxu[firstrm],reg32shunxu[firstreg], toolgetnummovetrue(firstmod));
+            return 0;
         }
         else {
+            //当上一个字节的mod不为0时，该字节的rm为ebp时正常解析，不为空
             int ret = toolgetmovadd(erjinzhidata + 1, tmppianyi, beforemod);
-            if (firstrm == 4) {
+            //当reg为esp时为空，该规则保持不变
+            if (firstreg == 4) {
                 sprintf(tmpstr, "%s%s", reg32shunxu[firstrm], tmppianyi);
             }
             sprintf(tmpstr, "%s+%s*%d%s", reg32shunxu[firstrm], reg32shunxu[firstreg], toolgetnummovetrue(firstmod), tmppianyi);
             return ret;
         }
-    }
 
     return 0;
 }
+
 int toolgetnummovetrue(int zhishu)
 {
     int num = 1;
@@ -124,7 +129,32 @@ int toolreplacestrforduanreg(char* srcstr, char* valuestr)
     }
     return 0;
 }
+int toolreplaceanystr(char* srcstr,char* deletestr,int strlength,char* valuestr)
+{
+    std::string csrcstr = srcstr;
+    size_t pos = csrcstr.find(deletestr);
+    if (pos != std::string::npos) {
+        {
+            csrcstr.replace(pos, strlength, valuestr);
+            strcpy(srcstr, csrcstr.c_str());
+            return 1;
+        }
+    }
+    return 0;
+}
+int toolClearAfterChar(char* srcstr, char delimiter)
+{
+    //该函数用于将字符串的指定字符后的内容滞空
+    // 查找分隔符的位置
+    char* foundPos = strchr(srcstr, delimiter);
 
+    if (foundPos != nullptr) {
+        // 在分隔符位置处截断字符串
+        *foundPos = '\0';
+        return 1;
+    }
+    return 0;
+}
 int toolcheckisduanopcode(unsigned char opcode)
 {
     switch (opcode)
@@ -176,4 +206,14 @@ int toolgetperukoupianyi(char* memdata,int& pianyi,int &base)
     pianyi = pekexuanheader->AddressOfEntryPoint;
     base = pekexuanheader->ImageBase;
     return 1;
+}
+
+int toolcheckisyunsuanopcode(unsigned char opcode)
+{
+    const char opcodes_array[] = { 0x31, 0x33, 0x29, 0x2B, 0x09, 0x0B, 0x21, 0x23, 0x85, 0x39, 0x3B ,0x05,0x03};
+    for (size_t i = 0; i < 13; i++)
+    {
+        if (opcode == (unsigned char)opcodes_array[i])return 1;
+    }
+    return 0;
 }
