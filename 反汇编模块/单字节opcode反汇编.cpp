@@ -23,10 +23,10 @@ const char* jmpshunxu[] = { "JO","JNO", "JB/JNAE/JC","JNB/JAE/JNC",
 };
 const char* loopshunxu[] = { "LOOPNE/LOOPNZ","LOOPE/LOOPZ","LOOP","JrCXZ" };
 const char* calljmpshunxu[] = { "CALL","JMP","JMP FAR","JMP SHORT" };
-const char* retshunxu[] = { "RET","RET","RETF","RETF" };
-const char* duanregshunxu[] = {"", "ES:","CS:","SS:","DS:","FS:","GS:"};
-const char* yunsuanshunxu[] = {"ADD", "OR","ADC:","SBB","AND","SUB","XOR","CMP","TEST"};
-const char* ffopcodecaozuofanyi[] = { "INC","DEC", "CALL", "CALL FAR", "JMP", "JMP FAR", "PUSH"};
+const char* retshunxu[] = { "RET","RET","RETF","RETF" ,"","" ,"","" ,"",""};
+const char* duanregshunxu[] = {"", "ES:","CS:","SS:","DS:","FS:","GS:","",""};
+const char* yunsuanshunxu[] = {"ADD", "OR","ADC:","SBB","AND","SUB","XOR","CMP","TEST","",""};
+const char* ffopcodecaozuofanyi[] = { "INC","DEC", "CALL", "CALL FAR", "JMP", "JMP FAR", "PUSH","","",};
 
 int fanhuibianB0toBf(char* erjinzhidata, char* outhuibian)
 {
@@ -84,21 +84,32 @@ int fanhuibiancx(char* erjinzhidata, char* outhuibian)
         return fanhuibianc7(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
     }
     if ((opcode >= 0xc2 && opcode <= 0xc3) || (opcode >= 0xca && opcode <= 0xcb)) {
-        int size = 1;
-        int retindex = opcode & 0xF - 2;
-        char truetwosizezijie[20] = { 0 };
-        if (opcode == 0xc2 || opcode == 0xca) {
-            toolgettrue32byte(erjinzhidata + 1, truetwosizezijie, 2);
-            size = 3;
-        }
-        if (opcode == 0xca || opcode == 0xcb) {
-            retindex = opcode & 0xF - 8;
-        }
-        sprintf(outhuibian, "%s  %s\n", retshunxu[retindex], truetwosizezijie);
-        return size;
+        return fanhuibiancxretpart(erjinzhidata, outhuibian);
+    }
+    if (opcode == 0xc9) {
+        sprintf(outhuibian, "LEAVE\n");
+        return 1;
     }
     sprintf(outhuibian, "cx系反汇编失败 opcode:%x\n", opcode);
     return -1;
+}
+
+int fanhuibiancxretpart(char* erjinzhidata, char* outhuibian)
+{
+    //该函数用于反汇编cx系列中的ret系列
+    unsigned char opcode = erjinzhidata[0];
+    int size = 1;
+    int retindex = opcode & 0xF - 2;
+    char truetwosizezijie[20] = { 0 };
+    if (opcode == 0xc2 || opcode == 0xca) {
+        toolgettrue32byte(erjinzhidata + 1, truetwosizezijie, 2);
+        size = 3;
+    }
+    if (opcode == 0xca || opcode == 0xcb) {
+        retindex = opcode & 0xF - 8;
+    }
+    sprintf(outhuibian, "%s  %s\n", retshunxu[retindex], truetwosizezijie);
+    return size;
 }
 
 int fanhuibian8x(char* erjinzhidata, char* outhuibian)
@@ -110,30 +121,28 @@ int fanhuibian8x(char* erjinzhidata, char* outhuibian)
         unsigned char firstmod = (twoopcode >> 6) & 0x03;
         unsigned char firstreg = (twoopcode >> 3) & 0x07;
         unsigned char firstrm = twoopcode & 0x07;
-        if (opcode >= 0x80 && opcode <= 0x83) {
-            return fanhuibian80to83(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
-        }
-        switch (opcode) {
-        case 0x88: {
-            return fanhuibian88(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
-        }
-        case 0x89: {
-            return fanhuibian89(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
-        }
-        case 0x8a:
-        {
-            return fanhuibian8a(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
-        }
-        case 0x8b:{
-            return fanhuibian8b(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
-        }
-        case 0x8d:{
-            return fanhuibian8d(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
-        }
-    }
+        return  fanhuibian8xfuzapart(erjinzhidata,outhuibian,firstmod,firstreg,firstrm);
     }
 
     sprintf(outhuibian, "8x系反汇编失败 opcode:%x\n", opcode);
+    return -1;
+}
+
+int fanhuibian8xfuzapart(char* erjinzhidata, char* outhuibian, unsigned char firstmod, unsigned char firstreg, unsigned char firstrm)
+{
+    //该函数用于反汇编8x系列中复杂的部分，包含mov,mov立即数，还有运算符指令
+    //这些指令都涉及到了指令的不定长多字节解析
+    unsigned char opcode = erjinzhidata[0];
+    if (opcode >= 0x80 && opcode <= 0x83) {
+        return fanhuibian80to83(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
+    }
+    switch (opcode) {
+    case 0x88: return fanhuibian88(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
+    case 0x89:return fanhuibian89(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
+    case 0x8a: return fanhuibian8a(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
+    case 0x8b:return fanhuibian8b(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
+    case 0x8d:return fanhuibian8d(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
+    }
     return -1;
 }
 
@@ -364,8 +373,11 @@ int fanhuibianyunsuanopcode(char* erjinzhidata, char* outhuibian)
     unsigned char firstreg = (twoopcode >> 3) & 0x07;
     unsigned char firstrm = twoopcode & 0x07;
 
+    if (opcode >= 0x29) {
+        return fanhuibianyunsuanopcodepart2(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
+    }
     int yunsuanindex = 0;
-    int ret = 0;
+    int ret = -1;
     switch (opcode) {
     case 0x03:
         ret = fanhuibian8b(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
@@ -387,20 +399,33 @@ int fanhuibianyunsuanopcode(char* erjinzhidata, char* outhuibian)
     case 0x23:
         ret=fanhuibian8b(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
         break;
+    
+    }
+    toolreplaceanystr(outhuibian, (char*)"MOV", 3, (char*)yunsuanshunxu[yunsuanindex]);
+    return ret;
+}
+
+int fanhuibianyunsuanopcodepart2(char* erjinzhidata, char* outhuibian, unsigned char firstmod, unsigned char firstreg, unsigned char firstrm)
+{
+    //反汇编运算符and or等指令，这是该函数opcode大于29的部分，规则和mov相同，只需替换操作字符串即可
+    unsigned char opcode = erjinzhidata[0];
+    int yunsuanindex = 0;
+    int ret = -1;
+    switch (opcode) {
     case 0x29:
-        ret= fanhuibian89(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
+        ret = fanhuibian89(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
         yunsuanindex = 3;
         break;
     case 0x2B:
-        ret=fanhuibian8b(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
+        ret = fanhuibian8b(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
         yunsuanindex = 3;
         break;
     case 0x31:
-        ret=fanhuibian89(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
+        ret = fanhuibian89(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
         yunsuanindex = 6;
         break;
     case 0x33:
-        ret=fanhuibian8b(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
+        ret = fanhuibian8b(erjinzhidata, outhuibian, firstmod, firstreg, firstrm);
         yunsuanindex = 6;
         break;
     case 0x39:

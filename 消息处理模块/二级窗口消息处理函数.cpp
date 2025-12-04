@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <tchar.h>
 #include <CommCtrl.h>
+
 namespace winpetoolfile {
 	extern TCHAR filepath[MAX_PATH];
 	extern TCHAR savefilepath[MAX_PATH];
@@ -53,7 +54,16 @@ BOOL CALLBACK pequduanfun(
 			return true;
 		}
 		return false;
-
+	case WM_NOTIFY:
+	{
+		//展示区段原始字节
+		NMHDR* moreinfo = (NMHDR*)(lParam); //lParam中存储的是该动作的（点击）详细信息（多少行）
+		if (moreinfo->idFrom == IDC_LIST2_pequduan && moreinfo->code == NM_CLICK) {
+			showpequduan16zijie(lParam, hwndDlg, IDC_EDIT2_quduan16zijie);
+			return true;
+		}
+		return false;
+	}
 	case  WM_COMMAND:
 	{
 		switch (LOWORD(wParam))

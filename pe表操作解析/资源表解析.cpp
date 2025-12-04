@@ -67,9 +67,6 @@ void ziyuanbiaojiexiinfile(char* filedata, HWND dadjubing,int id)
 				}
 
 			}
-
-		
-	   
 	}
 
 	MessageBox(NULL, TEXT("解析资源表成功"), TEXT("成功"), NULL);

@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <tchar.h>
 #include "../进程操作模块/进程动态dll注入.h"
-
 #include "../消息处理模块/消息处理函数.h"
 #include "../资源模块/resource.h"
 #include <CommCtrl.h>
@@ -14,6 +13,7 @@
 #include "../pe静态操作/注入代码.h"
 #include "../工具模块/文件操作.h"
 #include "../壳模块/读取程序加密后附加.h"
+#include "../pe静态操作/pe基础信息展示.h"
 #include <string>
 #include "pe功能总控.h"
 #include "../工具模块/检查.h"
@@ -31,6 +31,11 @@ namespace winpejinchenginfo {
 	extern int isrunjinchengzhuru;
 	extern char* gongxiangneicun;
 }
+struct xianchengfanhuibian {
+	char* memdata;
+	HWND dadjubing;
+	int id;
+};
 
 int showpeui(_In_ HINSTANCE hInstance,HWND dadjubing)
 {
@@ -317,23 +322,66 @@ BOOL savefilegetpath(HWND dadjubing, LPTSTR szFileName, DWORD nMaxFileName)
 
 	return GetSaveFileName(&ofn);
 }
-
+/*char tmpcode[] = { 0x8b,0x2c,0x15,0x12,0x13,0x14,0x15,0x8b,0x2c,0x25,0x12,0x13,0x14,0x15,0x8b,0xac,0x15,0x12,0x13,0x14,0x15 };*/
+	//fabnhuibianmain(base + pianyi, tmpcode, 21, dadjubing, id)==1
 int apifanhuibianmain(char *memdata,HWND dadjubing,int id)
 {
-	char tmpcode[] = { 0x8b,0x2c,0x15,0x12,0x13,0x14,0x15,0x8b,0x2c,0x25,0x12,0x13,0x14,0x15,0x8b,0xac,0x15,0x12,0x13,0x14,0x15 };
+	//该函数用于调用反汇编（创建一个线程）功能，规则是如果连着成功3次反汇编语句就认为这里是反汇编
+	//否则输出原始字节
+	struct xianchengfanhuibian* info = (xianchengfanhuibian*)malloc(sizeof(xianchengfanhuibian));
+	info->memdata = memdata;
+	info->dadjubing = dadjubing;
+	info->id = id;
+	HANDLE xiancheng = CreateThread(NULL, 0, xianchengapifanhuibianmain,
+		(void*)info, 0, NULL);
+	return 1;
+}
+DWORD WINAPI xianchengapifanhuibianmain(LPVOID lpParameter) {
 
+	struct xianchengfanhuibian* info = (struct xianchengfanhuibian*)lpParameter;
 
 	int pianyi = 0;
 	int base = 0;
-	HWND listjubing = GetDlgItem(dadjubing, id);
+	int isfanhuibianchenggong = -1;
+
+	HWND listjubing = GetDlgItem(info->dadjubing, info->id);
 	ListView_DeleteAllItems(listjubing);
-	toolgetperukoupianyi(memdata, pianyi, base);
-	//fabnhuibianmain(base + pianyi, memdata + pianyi, 0x100, dadjubing, id)
-	//fabnhuibianmain(base + pianyi, tmpcode, 21, dadjubing, id)==1
-	if (fabnhuibianmain(base + pianyi, memdata + pianyi, 0x200, dadjubing, id)==1) {
-		MessageBox(NULL, TEXT("反汇编成功"), TEXT("成功"), NULL);
-		return 1;
+	toolgetperukoupianyi(info->memdata, pianyi, base);
+	int size = toolgetquduansize(info->memdata, pianyi);
+
+	char tmp[3][80] = { 0 };
+	char yuanshizijie[3][80] = { 0 };
+	int cunjizhi[3] = { 0 };
+
+	base = base + pianyi;
+	info->memdata = info->memdata + pianyi;
+	int test = (int)info->memdata + size;
+
+	for (; (int)info->memdata < test;)
+	{
+		for (size_t i = 0; i < 3; i++)
+		{
+			cunjizhi[i] = base;
+			int ret = fabnhuibianmain(base, info->memdata, tmp[i], yuanshizijie[i]);
+			if (ret == -1) {
+				isfanhuibianchenggong = i + 1;
+				break;
+			}
+		}
+		if (isfanhuibianchenggong > 0)
+		{
+			for (size_t i = 0; i < isfanhuibianchenggong; i++) {
+				showpefanhuibian(info->dadjubing, info->id, cunjizhi[i], yuanshizijie[i], (char*)"");
+			}
+		}
+		else {
+			for (size_t i = 0; i < 3; i++) {
+				showpefanhuibian(info->dadjubing, info->id, cunjizhi[i], yuanshizijie[i], tmp[i]);
+			}
+		}
+		isfanhuibianchenggong = -1;
 	}
-	MessageBox(NULL, TEXT("反汇编失败"), TEXT("失败"), NULL);
-	return 0;
+	MessageBox(NULL, TEXT("反汇编成功"), TEXT("成功"), NULL);
+	return 1;
+    
 }

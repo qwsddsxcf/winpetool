@@ -10,4 +10,8 @@ int showpecdwbiaoinfo(char* filedata, HWND dadjubing);
 int showpeziyuanbiaoinfo(char* filedata, HWND dadjubing,int id);
 int showpeiatbiaoinfo(char* filedata, HWND dadjubing);
 
+int showpequduan16zijie(LPARAM moreinfo, HWND dadjubing, int id);
 int showpefanhuibian(HWND dadjubing, int id, int jizhi, char* yuanshizijie, char* fanhuibian);
+
+
+DWORD WINAPI xianchengshowpequduan16zijie(LPVOID lpParameter);

@@ -32,3 +32,6 @@ bool openpefile(HWND dadjubing, TCHAR* outPath, DWORD outSize);
 BOOL savefilegetpath(HWND dadjubing, LPTSTR szFileName, DWORD nMaxFileName);
 
 int apifanhuibianmain(char* memdata, HWND dadjubing, int id);
+
+
+DWORD WINAPI xianchengapifanhuibianmain(LPVOID lpParameter);

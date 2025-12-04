@@ -14,5 +14,6 @@ int toolreplacestrifisduanopcode(int num,char* outstr);
 int toolcheckisnullmeanopcode(unsigned char opcode);
 
 int toolgetperukoupianyi(char* memdata, int& pianyi, int& base);
+int toolgetquduansize(char* memdata, int pianyi);
 
 int toolcheckisyunsuanopcode(unsigned char opcode);

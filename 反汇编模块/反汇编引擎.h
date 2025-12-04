@@ -1,6 +1,6 @@
 #pragma once
 #include<windows.h>
-int fabnhuibianmain(int jizhi,char* erjinzhidata,int size, HWND dadjubing, int id);
+int fabnhuibianmain(int& jizhi, char* &erjinzhidata, char* tmp, char* yuanshi16data);
 int apifanhuibianchoseopcodesizefun(char* erjinzhidata, char* outhuibian, int curjizhi);
 
 int apifanhuibianonebyteopcodechose(char* erjinzhidata,char* outhuibian, int curjizhi);

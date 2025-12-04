@@ -42,6 +42,7 @@ void AppendEditText(HWND hDlg, int editId, const TCHAR* newText)
 	// 用 EM_REPLACESEL 插入文本（包括换行符）
 	SendMessage(hEdit, EM_REPLACESEL, FALSE, (LPARAM)newText);
 
+
 }
 
 char* getshuruinfothentoascii(HWND dadjubing, int id)

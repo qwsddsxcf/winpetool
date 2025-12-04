@@ -207,6 +207,29 @@ int toolgetperukoupianyi(char* memdata,int& pianyi,int &base)
     base = pekexuanheader->ImageBase;
     return 1;
 }
+int toolgetquduansize(char* memdata, int pianyi) {
+
+    //传入一个内存偏移，返回该偏移所在区段的区段大小
+    PIMAGE_DOS_HEADER doshead = (PIMAGE_DOS_HEADER)memdata;
+
+    PIMAGE_NT_HEADERS pehead = (PIMAGE_NT_HEADERS)(doshead->e_lfanew + memdata);
+
+    PIMAGE_SECTION_HEADER quduanhead = IMAGE_FIRST_SECTION(pehead);
+
+    if (pianyi < quduanhead[0].VirtualAddress)
+    {
+        return -1;
+    }
+    for (size_t i = 0; i < pehead->FileHeader.NumberOfSections; i++)
+    {
+        if (pianyi >= quduanhead[i].VirtualAddress && pianyi <= quduanhead[i].VirtualAddress + quduanhead[i].Misc.VirtualSize)
+        {
+            return  quduanhead[i].Misc.VirtualSize;
+        }
+    }
+    return -1;
+}
+
 
 int toolcheckisyunsuanopcode(unsigned char opcode)
 {

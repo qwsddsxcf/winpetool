@@ -1,38 +1,32 @@
 #include "反汇编引擎.h"
 #include"单字节opcode反汇编.h"
+#include "单字节opcode反汇编part2.h"
 #include "双字节opcode反汇编.h"
 #include"反汇编tool.h"
 #include "../pe静态操作/pe基础信息展示.h"
 #include<stdio.h>
 #pragma warning(disable : 4996)
 int fanhuibiankeyqianzui66 = 0;
-int fabnhuibianmain(int cjizhi,char* erjinzhidata,int size,HWND dadjubing,int id)    
+//HWND dadjubing, int id,int size,
+int fabnhuibianmain(int &jizhi,char* &erjinzhidata,char* tmp,char* yuanshi16data)
 {
-    int pianyi = 0;
-    int jizhi = cjizhi;
-   
-    for (; pianyi < size;)
+    
+    int returnpianyi= apifanhuibianchoseopcodesizefun(erjinzhidata, tmp,jizhi);
+
+    if (returnpianyi == -1) {
+        sprintf(yuanshi16data, "%02X ", (unsigned char)erjinzhidata[0]);
+        jizhi++;
+        erjinzhidata++;
+        return -1;
+     }
+
+    for (size_t k = 0; k < returnpianyi; k++)
     {
-        char opcode = erjinzhidata[pianyi];
-        char tmp[70] = {0};
-        char yuanshi16data[50] = { 0 };
-        int returnpianyi= apifanhuibianchoseopcodesizefun(erjinzhidata+pianyi, tmp,jizhi);
-
-        if (returnpianyi == -1) {
-           showpefanhuibian(dadjubing, id, jizhi, yuanshi16data, tmp);
-           return -1;
-        }
-
-        for (size_t k = 0; k < returnpianyi; k++)
-        {
-            sprintf(yuanshi16data+k*3, "%02X ", (unsigned char)erjinzhidata[pianyi+k]);
-        }
-        showpefanhuibian(dadjubing, id, jizhi, yuanshi16data, tmp);
-     
-        pianyi = pianyi + returnpianyi;
-        jizhi = jizhi + returnpianyi;
+        sprintf(yuanshi16data+k*3, "%02X ", (unsigned char)erjinzhidata[0+k]);
     }
-    return 1;
+     jizhi = jizhi + returnpianyi;
+     erjinzhidata = erjinzhidata + returnpianyi;
+     return returnpianyi;
 }
 int apifanhuibianchoseopcodesizefun(char* erjinzhidata, char* outhuibian, int curjizhi)
 {
@@ -55,7 +49,7 @@ int apifanhuibianchoseopcodesizefun(char* erjinzhidata, char* outhuibian, int cu
         return ret+1;
     }
     else if (toolcheckisnullmeanopcode(opcode)) {
-        return 1;
+        return -1;
     }
     else {
         return  apifanhuibianonebyteopcodechose(erjinzhidata, outhuibian, curjizhi);
@@ -69,6 +63,9 @@ int apifanhuibianonebyteopcode40to7f(char* erjinzhidata, char* outhuibian, int c
     unsigned char opcode = erjinzhidata[0];
     if (opcode >= 0x40 && opcode <= 0x5f) {
         return fanhuibian40to5F(erjinzhidata, outhuibian);
+    }
+    if (opcode >= 0x60 && opcode <= 0x6f) {
+        return fanhuibian6x(erjinzhidata, outhuibian);
     }
     if (opcode >= 0x70 && opcode <= 0x7F) {
         return fanhuibian70to7F(erjinzhidata, outhuibian, curjizhi);

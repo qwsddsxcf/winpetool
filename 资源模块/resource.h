@@ -1,6 +1,6 @@
-ï»¿//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ ç”Ÿæˆçš„åŒ…å«æ–‡ä»¶ã€‚
-// ä¾› mywin32apichengxu.rc ä½¿ç”¨
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ Éú³ÉµÄ°üº¬ÎÄ¼ş¡£
+// ¹© mywin32apichengxu.rc Ê¹ÓÃ
 //
 #define IDC_MYICON                      2
 #define IDD_MYWIN32APICHENGXU_DIALOG    102
@@ -98,6 +98,7 @@
 #define IDC_BUTTON7_runcode             1055
 #define IDC_LIST2                       1057
 #define IDC_LIST2_fanhuibian            1057
+#define IDC_EDIT2_quduan16zijie         1058
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -107,7 +108,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1058
+#define _APS_NEXT_CONTROL_VALUE         1059
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

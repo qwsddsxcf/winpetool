@@ -13,8 +13,15 @@
 TCHAR tmp[MAX_PATH] = _T("");
  namespace winpetoolfile {
 	 extern TCHAR filepath[MAX_PATH];
+	 extern char* filedata;
 }
 
+ struct pequduan16zijie {
+	 HWND dadjubing;
+	 int id;
+	 int filepianyinum ;
+	 int filesizenum;
+ };
 
 int showpejichuinfo(char* filedata, HWND dadjubing)
 {
@@ -283,10 +290,65 @@ int showpeiatbiaoinfo(char* filedata, HWND dadjubing)
 	return 0;
 }
 
+int showpequduan16zijie(LPARAM moreinfo, HWND dadjubing, int id) {
+	//该函数用于展示用户点击一个区段详细原始文件16进制字节(创建线程)
+	//moreinfo在该函数结束后，这个指针指向的一些数据会销毁导致另一个线程无法获取数据，所以先拿到
+	//需要的信息，在传入另一个线程函数中使用
+	
+	struct pequduan16zijie* info = (pequduan16zijie*)malloc(sizeof(struct pequduan16zijie));
+
+	NMHDR* pNMHDR = (NMHDR*)(moreinfo);
+
+	NMITEMACTIVATE* pItemActivate = (NMITEMACTIVATE*)(moreinfo);
+	int hang = pItemActivate->iItem;
+	if (hang == -1)return 0;
+
+	TCHAR filepianyi[20] = { 0 };
+	TCHAR filesize[20] = { 0 };
+	TCHAR tmp[80] = { 0 };
+	//获取用户点击的哪一行字符串转换为整数，文件偏移，大小
+	ListView_GetItemText(pNMHDR->hwndFrom, hang, 3, filepianyi, _countof(filepianyi));
+	ListView_GetItemText(pNMHDR->hwndFrom, hang, 4, filesize, _countof(filesize));
+	swscanf_s(filepianyi, TEXT("%x"), &info->filepianyinum);
+	swscanf_s(filesize, TEXT("%x"), &info->filesizenum);
+	info->dadjubing = dadjubing;
+	info->id = id;
+
+	HANDLE xiancheng = CreateThread(NULL, 0, xianchengshowpequduan16zijie,
+		(void*)info, 0, NULL);
+
+	return 1;
+}
+DWORD WINAPI xianchengshowpequduan16zijie(LPVOID lpParameter) {
+	struct pequduan16zijie* info = (struct pequduan16zijie*)lpParameter;
+
+	HWND hEdit = GetDlgItem(info->dadjubing, info->id);
+	SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)TEXT(""));//清空原本的内容
+	SendMessage(hEdit, EM_SETLIMITTEXT, 0, 0);//设置最大原始字节无限制
+	AppendEditText(info->dadjubing, info->id, TEXT("原始文件中字节如下：  \n"));
+
+	//每一行显示16个字节和地址
+	char* nowaddress = winpetoolfile::filedata + info->filepianyinum;
+	int cishu = info->filesizenum / 16;
+	int nowxianshiaddress = info->filepianyinum;
+	for (size_t i = 0; i < cishu; i++)
+	{
+		_sntprintf_s(tmp, _countof(tmp), _T("%d 0x%08X:"), i, nowxianshiaddress);
+		for (size_t i = 0; i < 16; i++)
+		{
+			_sntprintf_s(tmp, _countof(tmp), _T("%s %x"), tmp, (unsigned char)nowaddress[0]);
+			nowaddress++;
+		}
+		nowxianshiaddress += 16;
+		_sntprintf_s(tmp, _countof(tmp), _T("%s\n"), tmp);
+		AppendEditText(info->dadjubing, info->id, tmp);
+	}
+	return 1;
+}
 int showpefanhuibian(HWND dadjubing, int id, int jizhi, char* yuanshizijie, char* fanhuibian)
 {
 	HWND listjubing = GetDlgItem(dadjubing, id);
-	//ListView_DeleteAllItems(listjubing);
+	
 
 	LV_ITEM data{ 0 };
 	TCHAR cjizhi[20] = { 0 };
